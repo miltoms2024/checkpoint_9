@@ -12,39 +12,65 @@ const HORARIOS = {
 const MENUS = {
     desayuno: {
         principales: [
-            { id: 1, nombre: "Clásico", descripcion: "Café solo + tostadas", precio: 2.50 },
+            { id: 1, nombre: "Clásico", descripcion: "Café solo + tostadas", precio: 3.50 },
             { id: 2, nombre: "Energético", descripcion: "Café con leche + huevos revueltos", precio: 6.00 },
             { id: 3, nombre: "Saludable", descripcion: "Té verde + yogur con frutas", precio: 7.00 }
         ],
-        acompanamientos: [
-            { id: 1, nombre: "Jugo natural", precio: 2.00 },
-            { id: 2, nombre: "Croissant", precio: 3.00 },
-            { id: 3, nombre: "Fruta fresca", precio: 4.00 }
+        acompanamientos: [ // Primera lista de acompañamientos para desayuno
+            { id: 1, nombre: "Jugo natural", precio: 3.00 },
+            { id: 2, nombre: "Macedonia", precio: 3.00 },
+            { id: 3, nombre: "Fruta fresca", precio: 3.00 }
+        ],
+        acompanamientos2: [ // Segunda lista de acompañamientos para desayuno
+            { id: 1, nombre: "Mantequilla", precio: 1.50 },
+            { id: 2, nombre: "Mermelada", precio: 1.50 },
+            { id: 3, nombre: "Muffin de arándanos", precio: 3.50 }
         ]
+        // No hay postres para el desayuno
     },
     almuerzo: {
         principales: [
-            { id: 1, nombre: "Ensalada César", precio: 10.00 },
-            { id: 2, nombre: "Hamburguesa Clásica", precio: 12.00 },
-            { id: 3, nombre: "Pasta Alfredo", precio: 11.50 }
+            { id: 1, nombre: "Paella de Mixta", precio: 10.00 },
+            { id: 2, nombre: "Hamburguesa Clásica", precio: 10.00 },
+            { id: 3, nombre: "Pasta Alfredo", precio: 8.50 }
         ],
-        acompanamientos: [
+        acompanamientos: [ // Primera lista de acompañamientos para almuerzo
             { id: 1, nombre: "Patatas Fritas", precio: 3.50 },
             { id: 2, nombre: "Ensalada Mixta", precio: 4.00 },
             { id: 3, nombre: "Sopa del Día", precio: 5.00 }
+        ],
+        acompanamientos2: [ // Segunda lista de acompañamientos para almuerzo
+            { id: 1, nombre: "Aros de Cebolla", precio: 4.00 },
+            { id: 2, nombre: "Pan de Ajo", precio: 3.00 },
+            { id: 3, nombre: "Ensalada de Col", precio: 3.50 }
+        ],
+        postres: [ // Lista de postres para almuerzo
+            { id: 1, nombre: "Helado de Vainilla", precio: 4.00 },
+            { id: 2, nombre: "Tarta de Queso", precio: 5.50 },
+            { id: 3, nombre: "Fruta de Temporada", precio: 3.00 }
         ]
     },
     cena: {
         // Mismos platos que almuerzo, pero con precios ajustados para cena
         principales: [
-            { id: 1, nombre: "Ensalada César", precio: 12.00 },
-            { id: 2, nombre: "Hamburguesa Clásica", precio: 14.00 },
-            { id: 3, nombre: "Pasta Alfredo", precio: 13.50 }
+            { id: 1, nombre: "Paella Mixta", precio: 12.00 },
+            { id: 2, nombre: "Hamburguesa Clásica", precio: 12.00 },
+            { id: 3, nombre: "Pasta Alfredo", precio: 10.50 }
         ],
-        acompanamientos: [
+        acompanamientos: [ // Primera lista de acompañamientos para cena
             { id: 1, nombre: "Patatas Fritas", precio: 4.00 },
             { id: 2, nombre: "Ensalada Mixta", precio: 4.50 },
             { id: 3, nombre: "Sopa del Día", precio: 5.50 }
+        ],
+        acompanamientos2: [ // Segunda lista de acompañamientos para cena
+            { id: 1, nombre: "Pan Casero", precio: 3.50 },
+            { id: 2, nombre: "Verduras al Vapor", precio: 5.00 },
+            { id: 3, nombre: "Arroz Blanco", precio: 3.00 } // Cambié el ejemplo para que no sea un postre aquí
+        ],
+        postres: [ // Lista de postres para cena
+            { id: 1, nombre: "Brownie con Helado", precio: 6.00 },
+            { id: 2, nombre: "Crema Catalana", precio: 5.00 },
+            { id: 3, nombre: "Mousse de Limón", precio: 4.50 }
         ]
     }
 };
@@ -158,7 +184,7 @@ function validarYFormatearHora(horaTexto) {
         }
         let minutosParte = parseFloat("0." + minutosStr);
         if (minutosParte >= 0.60) { // Si la parte decimal es .60 o más, significa minutos >= 60
-             return { valido: false, mensaje: "Minutos inválidos. La parte decimal de la hora debe ser menor a .60 (ej. 8.5 para 8:30, no 8.65)." };
+            return { valido: false, mensaje: "Minutos inválidos. La parte decimal de la hora debe ser menor a .60 (ej. 8.5 para 8:30, no 8.65)." };
         }
     }
 
@@ -175,25 +201,16 @@ function obtenerComentarioAleatorio() {
 }
 
 /**
- * Genera el texto del menú completo para un turno específico (desayuno, almuerzo, cena).
- * @param {string} tipoMenu El turno del menú ('desayuno', 'almuerzo', 'cena').
- * @returns {string} El texto formateado del menú.
+ * Formatea una lista de platos (principales, acompañamientos, etc.) en una sola línea,
+ * separados por guiones y sin precios, en mayúsculas.
+ * @param {Array<Object>} listaPlatos El array de objetos de platos.
+ * @returns {string} Una cadena con los nombres de los platos separados por " - ".
  */
-function mostrarMenu(tipoMenu) {
-    const menuActual = MENUS[tipoMenu];
-    let mensaje = `--- Menú de ${tipoMenu.charAt(0).toUpperCase() + tipoMenu.slice(1)} ---\n\n`;
-
-    mensaje += "PLATOS PRINCIPALES:\n";
-    menuActual.principales.forEach(plato => {
-        mensaje += `${plato.id}. ${plato.nombre}: ${plato.descripcion} (${plato.precio.toFixed(2)}€)\n`;
-    });
-
-    mensaje += "\nACOMPAÑAMIENTOS:\n";
-    menuActual.acompanamientos.forEach(acomp => {
-        mensaje += `${acomp.id}. ${acomp.nombre} (${acomp.precio.toFixed(2)}€)\n`;
-    });
-
-    return mensaje;
+function formatearListaParaVisualizacion(listaPlatos) {
+    if (!listaPlatos || listaPlatos.length === 0) {
+        return "No disponible.";
+    }
+    return listaPlatos.map(plato => plato.nombre.toUpperCase()).join(' - ');
 }
 
 // --- FIN FUNCIONES DE AYUDA ---
@@ -213,26 +230,28 @@ function obtenerTurno(hora) {
         return 'desayuno';
     } else if (hora >= HORARIOS.almuerzo.inicio && hora < HORARIOS.almuerzo.fin) {
         return 'almuerzo';
-    } else if (hora >= HORARIOS.cena.inicio && hora < HORARIOS.cena.fin) { // Asegura que 23.00 no esté incluido
+    } else if (hora >= HORARIOS.cena.inicio && hora < HORARIOS.cena.fin) {
         return 'cena';
     }
     return null; // Fuera de horario de servicio
 }
 
 /**
- * Permite al usuario seleccionar un plato (principal o acompañamiento) del menú.
+ * Permite al usuario seleccionar un plato (principal o acompañamiento) de una lista específica.
  * Incluye validación de la selección.
- * @param {string} tipoPlato Etiqueta del plato ('Plato Principal', 'Acompañamiento 1', etc.).
- * @param {Array<Object>} listaPlatos El array de platos (principales o acompañamientos) para el turno actual.
- * @param {string} turnoActual El turno de comida actual ('desayuno', 'almuerzo', 'cena').
+ * @param {string} tituloPrompt El título o etiqueta para el prompt (ej. 'Plato Principal', 'Primer Acompañamiento').
+ * @param {Array<Object>} listaPlatos El array de platos (principales o acompañamientos) para elegir.
  * @returns {Object|null} El objeto del plato elegido o null si el usuario cancela.
  */
-function seleccionarPlato(tipoPlato, listaPlatos, turnoActual) {
-    let platoElegido = null;
-    let mensajeMenuCompleto = mostrarMenu(turnoActual); // Muestra todo el menú
-    let mensajeSeleccion = `${mensajeMenuCompleto}\n\nSeleccione el número de ${tipoPlato}:`; // Texto más claro
+function seleccionarPlato(tituloPrompt, listaPlatos) {
+    let mensajeOpciones = `--- Seleccione su ${tituloPrompt} ---\n\n`;
+    listaPlatos.forEach(item => {
+        // Mostrar ID, nombre y precio en el prompt de selección
+        mensajeOpciones += `${item.id}. ${item.nombre} (${item.precio.toFixed(2)}€)\n`;
+    });
+    mensajeOpciones += "\nIngrese el número de su elección:";
 
-    let seleccionId = obtenerEntrada(mensajeSeleccion, (input) => {
+    let seleccionId = obtenerEntrada(mensajeOpciones, (input) => {
         const numero = parseInt(input);
         // Debe ser un número, estar entre 1 y el número de opciones disponibles
         return !isNaN(numero) && numero >= 1 && numero <= listaPlatos.length;
@@ -243,12 +262,11 @@ function seleccionarPlato(tipoPlato, listaPlatos, turnoActual) {
     }
 
     const idNumerico = parseInt(seleccionId);
-    platoElegido = listaPlatos.find(plato => plato.id === idNumerico);
+    let platoElegido = listaPlatos.find(plato => plato.id === idNumerico);
 
-    // Aunque la validación de obtenerEntrada debería evitar esto, es un seguro
     if (!platoElegido) {
         alert("¡Error interno! La opción seleccionada no se encontró. Por favor, intente de nuevo.");
-        return null; // Devuelve null para que la función llamadora lo maneje
+        return null;
     }
 
     return platoElegido;
@@ -260,7 +278,6 @@ function seleccionarPlato(tipoPlato, listaPlatos, turnoActual) {
  * @returns {{costo: number, descripcion: string}} Objeto con el costo adicional y la descripción de la personalización.
  */
 function gestionarPersonalizacion(plato) {
-    // Comprueba si este plato tiene opciones de personalización definidas
     const opcionesPersonalizacion = PERSONALIZACIONES[plato.nombre];
 
     if (opcionesPersonalizacion && opcionesPersonalizacion.length > 0) {
@@ -277,7 +294,7 @@ function gestionarPersonalizacion(plato) {
 
         if (seleccionUsuario === null || parseInt(seleccionUsuario) === 0) {
             alert("No se ha añadido personalización.");
-            return { costo: 0, descripcion: "" }; // Devuelve 0 y una descripción vacía si no se personalizó
+            return { costo: 0, descripcion: "" };
         } else {
             const personalizacionElegida = opcionesPersonalizacion[parseInt(seleccionUsuario) - 1];
             if (personalizacionElegida) {
@@ -292,7 +309,7 @@ function gestionarPersonalizacion(plato) {
             }
         }
     }
-    return { costo: 0, descripcion: "" }; // Si no hay personalizaciones para este plato
+    return { costo: 0, descripcion: "" };
 }
 
 /**
@@ -301,114 +318,183 @@ function gestionarPersonalizacion(plato) {
  * @returns {boolean} True si el pedido se completó, false si fue cancelado.
  */
 function iniciarPedido(turnoActual) {
-    costoTotalPedidoActual = 0; // Reiniciar el costo para cada nuevo pedido
+    costoTotalPedidoActual = 0;
+    let detallesPedido = [];
 
-    alert(`¡Bienvenido a Bottega Diner en horario de ${turnoActual.toUpperCase()}!`);
+    // MODIFICACIÓN: Aquí es donde se muestra el "tipo de menú" y el resumen de platos sin precios
+    let mensajeMenuGeneral = `Ha elegido el menú de ${turnoActual.toUpperCase()}.\n\n`; // Primero el tipo de menú
+    mensajeMenuGeneral += `--- Menú de ${turnoActual.charAt(0).toUpperCase() + turnoActual.slice(1)} ---\n\n`;
+
+    mensajeMenuGeneral += `PRINCIPAL:\n${formatearListaParaVisualizacion(MENUS[turnoActual].principales)}\n\n`;
+
+    mensajeMenuGeneral += `ACOMPAÑAMIENTOS (Primer Selección):\n${formatearListaParaVisualizacion(MENUS[turnoActual].acompanamientos)}\n\n`;
+
+    if (MENUS[turnoActual].acompanamientos2 && MENUS[turnoActual].acompanamientos2.length > 0) {
+        mensajeMenuGeneral += `ACOMPAÑAMIENTOS (Segunda Selección):\n${formatearListaParaVisualizacion(MENUS[turnoActual].acompanamientos2)}\n\n`;
+    } else {
+        mensajeMenuGeneral += `ACOMPAÑAMIENTOS (Segunda Selección):\nNo disponible.\n\n`; // Mostrar explícitamente si no hay
+    }
+
+    if (MENUS[turnoActual].postres && MENUS[turnoActual].postres.length > 0) {
+        mensajeMenuGeneral += `POSTRES:\n${formatearListaParaVisualizacion(MENUS[turnoActual].postres)}\n\n`;
+    } else {
+        mensajeMenuGeneral += `POSTRES:\nNo disponible.\n\n`; // Mostrar explícitamente si no hay
+    }
+
+    alert(mensajeMenuGeneral); // Muestra este resumen antes de pedir la selección
+
 
     // --- SELECCIÓN PLATO PRINCIPAL ---
-    let platoPrincipal = seleccionarPlato("Plato Principal", MENUS[turnoActual].principales, turnoActual);
+    let platoPrincipal = seleccionarPlato("Plato Principal", MENUS[turnoActual].principales);
     if (platoPrincipal === null) {
         alert("Pedido cancelado.");
-        return false; // El usuario canceló
+        return false;
     }
     costoTotalPedidoActual += platoPrincipal.precio;
-    alert(`Has elegido "${platoPrincipal.nombre}". ${obtenerComentarioAleatorio()} (Precio: ${platoPrincipal.precio.toFixed(2)}€)`);
+    let mensajeDetalle = `Has elegido "${platoPrincipal.nombre}".`;
+    if (platoPrincipal.descripcion && platoPrincipal.descripcion !== "" && platoPrincipal.descripcion !== null) {
+        mensajeDetalle += ` Incluye: ${platoPrincipal.descripcion}.`;
+    }
+    mensajeDetalle += ` ${obtenerComentarioAleatorio()}`;
+    alert(mensajeDetalle);
 
-    // Gestión de personalización para el plato principal
     let personalizacionPrincipalInfo = gestionarPersonalizacion(platoPrincipal);
     costoTotalPedidoActual += personalizacionPrincipalInfo.costo;
-    // Crea el texto de personalización para el resumen
     let personalizacionPrincipalTexto = personalizacionPrincipalInfo.descripcion ?
-                                        ` + ${personalizacionPrincipalInfo.descripcion} (${personalizacionPrincipalInfo.costo.toFixed(2)}€)` : "";
+        ` + ${personalizacionPrincipalInfo.descripcion} (${personalizacionPrincipalInfo.costo.toFixed(2)}€)` : "";
+
+    detallesPedido.push({
+        tipo: "Plato Principal",
+        nombre: platoPrincipal.nombre,
+        precioBase: platoPrincipal.precio,
+        personalizacion: personalizacionPrincipalInfo.descripcion,
+        costoPersonalizacion: personalizacionPrincipalInfo.costo
+    });
 
 
     // --- SELECCIÓN DOS ACOMPAÑAMIENTOS ---
-    let acompanamientosSeleccionados = [];
-    const nombresAcomp = ["su primer acompañamiento", "su segundo acompañamiento"]; // Para mayor claridad
+    const titulosAcomp = ["Primer Acompañamiento", "Segundo Acompañamiento"];
 
     for (let i = 0; i < 2; i++) {
-        let acomp = seleccionarPlato(nombresAcomp[i], MENUS[turnoActual].acompanamientos, turnoActual);
+        let listaAcompParaSeleccionar;
+        let tituloAcompPrompt = titulosAcomp[i];
+
+        if (i === 0) {
+            listaAcompParaSeleccionar = MENUS[turnoActual].acompanamientos;
+        } else {
+            // Asegurarse de que el segundo acompañamiento exista antes de intentar seleccionarlo
+            if (MENUS[turnoActual].acompanamientos2 && MENUS[turnoActual].acompanamientos2.length > 0) {
+                listaAcompParaSeleccionar = MENUS[turnoActual].acompanamientos2;
+            } else {
+                alert(`No hay opciones para ${tituloAcompPrompt} en el menú de ${turnoActual}. Se saltará este paso.`);
+                continue; // Salta a la siguiente iteración del bucle si no hay opciones
+            }
+        }
+
+        let acomp = seleccionarPlato(tituloAcompPrompt, listaAcompParaSeleccionar);
         if (acomp === null) {
             alert("Pedido cancelado.");
-            return false; // El usuario canceló
+            return false;
         }
-        
-        // Gestión de personalización para los acompañamientos (si aplica)
+
         let personalizacionAcompInfo = gestionarPersonalizacion(acomp);
         costoTotalPedidoActual += personalizacionAcompInfo.costo;
-        // Almacena el texto de personalización directamente en el objeto acomp para el resumen
         acomp.personalizacionTexto = personalizacionAcompInfo.descripcion ?
-                                      ` + ${personalizacionAcompInfo.descripcion} (${personalizacionAcompInfo.costo.toFixed(2)}€)` : "";
+            ` + ${personalizacionAcompInfo.descripcion} (${personalizacionAcompInfo.costo.toFixed(2)}€)` : "";
 
-        // Push el acompañamiento después de añadirle la info de personalización
-        acompanamientosSeleccionados.push(acomp);
-        costoTotalPedidoActual += acomp.precio; // Suma el precio base del acompañamiento
-        alert(`Has elegido "${acomp.nombre}". ${obtenerComentarioAleatorio()} (Precio: ${acomp.precio.toFixed(2)}€)`);
-    }
+        alert(`Has elegido "${acomp.nombre}". ${obtenerComentarioAleatorio()}`);
 
-    // --- RESUMEN Y COSTO TOTAL ---
-    let resumen = `--- RESUMEN DE TU PEDIDO ---\n`;
-    // Añade el texto de personalización al plato principal
-    resumen += `Plato Principal: ${platoPrincipal.nombre} (${platoPrincipal.precio.toFixed(2)}€)${personalizacionPrincipalTexto}\n`;
+        costoTotalPedidoActual += acomp.precio;
 
-    // AÑADIDO: Listar los acompañamientos seleccionados con su personalización
-    if (acompanamientosSeleccionados.length > 0) {
-        resumen += `Acompañamientos:\n`;
-        acompanamientosSeleccionados.forEach(acomp => {
-            // Usa acomp.personalizacionTexto que ya contiene la info de la personalización
-            resumen += `- ${acomp.nombre} (${acomp.precio.toFixed(2)}€)${acomp.personalizacionTexto}\n`;
+        detallesPedido.push({
+            tipo: tituloAcompPrompt,
+            nombre: acomp.nombre,
+            precioBase: acomp.precio,
+            personalizacion: personalizacionAcompInfo.descripcion,
+            costoPersonalizacion: personalizacionAcompInfo.costo
         });
-    } else {
-        resumen += `Acompañamientos: Ninguno seleccionado.\n`;
     }
 
-    resumen += `\nCosto Total del Pedido: ${costoTotalPedidoActual.toFixed(2)}€`;
+    // --- SELECCIÓN DE POSTRE (Solo para Almuerzo y Cena) ---
+    if (MENUS[turnoActual].postres && MENUS[turnoActual].postres.length > 0) {
+        let postre = seleccionarPlato("Postre", MENUS[turnoActual].postres);
+        if (postre === null) {
+            alert("No se ha seleccionado ningún postre.");
+        } else {
+            costoTotalPedidoActual += postre.precio;
+            alert(`Has elegido "${postre.nombre}". ${obtenerComentarioAleatorio()}`);
 
-    alert(resumen);
-    return true; // Pedido completado exitosamente
+            detallesPedido.push({
+                tipo: "Postre",
+                nombre: postre.nombre,
+                precioBase: postre.precio,
+                personalizacion: "",
+                costoPersonalizacion: 0
+            });
+        }
+    }
+
+
+    // --- TICKET FINAL CON TODO DESGLOSADO ---
+    let ticket = `--- TICKET DE TU PEDIDO ---\n\n`;
+
+    detallesPedido.forEach(item => {
+        let linea = `${item.tipo}: ${item.nombre} (${item.precioBase.toFixed(2)}€)`;
+        if (item.personalizacion) {
+            linea += ` (${item.personalizacion} +${item.costoPersonalizacion.toFixed(2)}€)`;
+        }
+        ticket += `${linea}\n`;
+    });
+
+    ticket += `\nCosto Total: ${costoTotalPedidoActual.toFixed(2)}€`;
+
+    alert(ticket);
+    return true;
 }
 
 /**
  * Función que inicia todo el programa del restaurante.
  */
 function iniciarRestaurante() {
-    alert(`Bienvenido a Bottega Diner.\nHorario de atención: ${HORARIOS.desayuno.inicio}:00 a ${HORARIOS.cierreTotal}:00`);
-
     let continuarPrograma = true;
-    while (continuarPrograma) { // Bucle principal para permitir múltiples pedidos o reintentos
+    while (continuarPrograma) {
+        // MODIFICACIÓN PRINCIPAL: Fusión de bienvenida, horario general y solicitud de hora en un solo prompt
         let horaEntrada = obtenerEntrada(
-            "Ingrese la hora actual (formato 24h, ej: 8, 19.5 para 19:30). O presione Cancelar para salir.",
-            (input) => validarYFormatearHora(input) // Pasa la función de validación
+            `¡Bienvenido a Bottega Diner!\n\n` +
+            `Horario de atención: de ${HORARIOS.desayuno.inicio}:00 a ${HORARIOS.cierreTotal}:00.\n\n` +
+            `Ingrese la hora a la que desea acudir para su pedido (formato 24h). O presione Cancelar para salir.`,
+            (input) => validarYFormatearHora(input)
         );
 
-        if (horaEntrada === null) { // Usuario canceló al pedir la hora
+        if (horaEntrada === null) {
             salirDelPrograma();
             continuarPrograma = false;
-            break; // Salir del bucle principal
+            break;
         }
 
         const validacionHora = validarYFormatearHora(horaEntrada);
-        let hora = validacionHora.hora; // hora ya validada
+        let hora = validacionHora.hora;
 
         let turnoActual = obtenerTurno(hora);
 
         if (turnoActual) {
+            // Si hay un turno válido, se procede con iniciarPedido
             const pedidoRealizado = iniciarPedido(turnoActual);
-            if (!pedidoRealizado) { // Si el pedido fue cancelado en alguna fase intermedia
-                let reintentar = confirm("¿Desea intentar hacer otro pedido o salir?");
+            if (!pedidoRealizado) {
+                let reintentar = confirm("El pedido ha sido cancelado. ¿Desea intentar hacer otro pedido o salir?");
                 if (!reintentar) {
                     salirDelPrograma();
                     continuarPrograma = false;
                 }
             } else {
-                let otroPedido = confirm("¿Desea hacer otro pedido?");
+                let otroPedido = confirm("¡Pedido completado! ¿Desea hacer otro pedido?");
                 if (!otroPedido) {
                     salirDelPrograma();
                     continuarPrograma = false;
                 }
             }
         } else {
-            alert(`Lo sentimos, no estamos abiertos en esa hora para servir (${hora.toFixed(2)}). Por favor, intente de nuevo en el horario de ${HORARIOS.desayuno.inicio}:00 a ${HORARIOS.cierreTotal}:00.`);
+            alert(`Lo sentimos, no estamos abiertos a las ${hora.toFixed(2)}. Por favor, ingrese una hora dentro de nuestro horario de ${HORARIOS.desayuno.inicio}:00 a ${HORARIOS.cierreTotal}:00.`);
         }
     }
 }
